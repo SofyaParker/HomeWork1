@@ -1,2 +1,6 @@
 # Project exclude paths
+/.idea/
 /target/
+
+# Ignoring files
+/src/main/java/Currency.java
