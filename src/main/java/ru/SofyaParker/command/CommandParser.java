@@ -1,3 +1,5 @@
+package ru.SofyaParker.command;
+
 public class CommandParser {
     private final String COMMAND_PATTERN = "rate (TRY|USD|EUR) (tomorrow|week)";
 

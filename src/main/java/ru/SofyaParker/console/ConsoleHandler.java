@@ -1,10 +1,17 @@
+package ru.SofyaParker.console;
+
+import ru.SofyaParker.command.CommandParser;
+import ru.SofyaParker.command.UserCommand;
+import ru.SofyaParker.dataHandler.RatesCSVReader;
+import ru.SofyaParker.forecasting.ForecastingMean;
+
 import java.time.LocalDate;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConsoleHandler {
-    private final String DATE_PATTERN = "dd.MM.yyyy";
+    private static Logger log = Logger.getLogger(RatesCSVReader.class.getName());
 
     public void RunApp() {
         System.out.println("Введите команду (rate TRY/USD/EUR tomorrow/week)");
@@ -24,7 +31,7 @@ public class ConsoleHandler {
                 forecast.predictWeek(LocalDate.now());
             }
         } catch (NullPointerException e) {
-            System.out.println("Команда не найдена");
+            log.log(Level.SEVERE, "Команда не найдена: ", e);
             throw new RuntimeException(e);
         }
     }

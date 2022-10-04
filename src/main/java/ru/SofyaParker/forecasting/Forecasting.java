@@ -1,3 +1,5 @@
+package ru.SofyaParker.forecasting;
+
 import java.time.LocalDate;
 import java.util.Map;
 

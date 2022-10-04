@@ -1,3 +1,5 @@
+package ru.SofyaParker.command;
+
 public class UserCommand {
     private String command;
     private String currency;
