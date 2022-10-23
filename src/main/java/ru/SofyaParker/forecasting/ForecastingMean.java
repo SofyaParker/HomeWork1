@@ -1,88 +1,66 @@
 package ru.SofyaParker.forecasting;
 
+import lombok.Getter;
+import ru.SofyaParker.dataHandler.Rate;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ForecastingMean implements Forecasting {
-
-    private Map<LocalDate, Double> ratesMap;
-
+    private final int ONE = 1;
+    private final int ZERO = 0;
+    private List<Rate> ratesList;
+    @Getter
+    private List<Rate> predictionResult = new ArrayList<>();
     private final int PREDICTION_DEPTH = 7;
-    private final double NAN = Double.NaN;
     private final int DAYS_STEP = 1;
-
-    public ForecastingMean(Map<LocalDate, Double> ratesMap) {
-        this.ratesMap = ratesMap;
+    @Getter
+    private final LocalDate lastDate;
+    public ForecastingMean(List<Rate> ratesList) {
+        this.ratesList = ratesList;
+        this.lastDate = ratesList.get(ratesList.size()-1).getDate();
     }
 
-    public Map<LocalDate, Double> getRatesMap() {
-        return ratesMap;
+    public void updateRatesList(LocalDate date, Double rate) {
+        this.ratesList.add(new Rate(date, rate, ONE));
     }
 
-    public void updateRatesMap(LocalDate key, Double value) {
-        this.ratesMap.put(key, value);
-    }
-
-    /**
-     * The method calculate currency rate in a specific day using mean of last seven rates.
-     * @param date The day for which the forecast is required
-     * @return Currency forecast for the specified day
-     */
     @Override
     public Double predict(LocalDate date) {
-        Map<LocalDate, Double> shortRatesMap = getLastSevenRates(date);
-        double prediction = 0;
-        for (Map.Entry<LocalDate, Double> rate :
-                shortRatesMap.entrySet()) {
-            if (rate.getValue().equals(NAN)) {
-                predict(rate.getKey());
-            } else {
-                prediction += rate.getValue();
+        List<Rate> shortRatesList = getLastSevenRates();
+        Double prediction = Double.valueOf(ZERO);
+        for (Rate rate : shortRatesList) {
+            if (rate.getRate() == null) {
+                this.predict(rate.getDate());
             }
+            prediction += rate.getRate() / rate.getNominal();
         }
         prediction /= PREDICTION_DEPTH;
         return prediction;
     }
-
     @Override
-    public void predictTomorrow(LocalDate currentDate) {
-        Double prediction = this.predict(currentDate.plusDays(DAYS_STEP));
-        updateRatesMap(currentDate.plusDays(DAYS_STEP), prediction);
-        consoleOut(currentDate.plusDays(DAYS_STEP), prediction);
-    }
-
-    @Override
-    public void predictWeek(LocalDate currentDate) {
-        for (int i = 1; i <= PREDICTION_DEPTH; i++) {
-            Double prediction = this.predict(currentDate.plusDays(i));
-            updateRatesMap(currentDate.plusDays(i), prediction);
-            consoleOut(currentDate.plusDays(i), prediction);
+    public void predictPeriod(LocalDate toDate) {
+        List<Rate> resultList = new ArrayList<>();
+        LocalDate date = this.getLastDate().plusDays(DAYS_STEP);
+        while (!date.isAfter(toDate)) {
+            Double prediction = this.predict(date);
+            updateRatesList(date, prediction);
+            resultList.add(new Rate(date, prediction, ONE));
+            date = date.plusDays(DAYS_STEP);
         }
+        predictionResult = resultList;
     }
 
     /**
-     * Search for the last seven currency rates relative to a specific date
-     * @param date date before which finding seven rates
-     * @return The Map with LocalDate as keys and Double as values
+     * Search for the last seven currency rates based on date
+     * @return The List of rates
      */
-    private Map<LocalDate, Double> getLastSevenRates(LocalDate date) {
-        Map<LocalDate, Double> shortCurrencyMap = new HashMap<>();
-        int lastSevenRatesCounter = 0;
-        while (lastSevenRatesCounter < PREDICTION_DEPTH) {
-            Double rate = this.ratesMap.get(date);
-            if (rate != null) {
-                shortCurrencyMap.put(date, this.ratesMap.get(date));
-                lastSevenRatesCounter++;
-            }
-            date = date.minusDays(DAYS_STEP);
+    private List<Rate> getLastSevenRates() {
+        List<Rate> shortRateList = new ArrayList<>();
+        for (int i = 0; i < PREDICTION_DEPTH; i++) {
+            shortRateList.add(ratesList.get(ratesList.size() - i-1));
         }
-        return shortCurrencyMap;
+        return shortRateList;
     }
 
-    private static void consoleOut(LocalDate date, double rate) {
-        System.out.println(date.format(DateTimeFormatter.ofPattern("E dd.MM.yyyy")) +
-                " - " + String.format("%.2f", rate));
-    }
+
 }

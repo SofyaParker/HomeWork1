@@ -11,9 +11,11 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <org.assertj.version>3.8.0</org.assertj.version>
-        <junit.version>4.12</junit.version>
-        <org.apache.commons.version>1.8</org.apache.commons.version>
+        <assertj>3.8.0</assertj>
+        <junit>4.12</junit>
+        <commons-csv>1.8</commons-csv>
+        <opencsv>5.3</opencsv>
+        <lombok>1.18.24</lombok>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -21,24 +23,30 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>${org.assertj.version}</version>
+            <version>${assertj}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
+            <version>${junit}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>${org.apache.commons.version}</version>
+            <version>${commons-csv}</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.opencsv</groupId>
-            <artifactId>opencsv</artifactId>
-            <version>2.3</version>
+        <groupId>com.opencsv</groupId>
+        <artifactId>opencsv</artifactId>
+        <version>${opencsv}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
